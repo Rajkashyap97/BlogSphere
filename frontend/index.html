@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BlogSphere | Cloud-Powered Blogging Platform</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Header / Navigation Bar -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="brand">
+        <div class="brand-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 19l7-7 3 3-7 7-3-3z"></path>
+            <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path>
+            <path d="M2 2l7.586 7.586"></path>
+            <circle cx="11" cy="11" r="2"></circle>
+          </svg>
+        </div>
+        <div>
+          <h1 class="brand-title">BlogSphere</h1>
+          <p class="brand-subtitle">Sprint 10: The Data Storm &bull; MongoDB Atlas Powered</p>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <div id="connectionStatus" class="status-pill status-checking">
+          <span class="status-dot"></span>
+          <span class="status-text">Checking API...</span>
+        </div>
+        <button id="openUserModalBtn" class="btn btn-secondary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+          Manage Users
+        </button>
+        <button id="openPostModalBtn" class="btn btn-primary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          New Post
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Notification Banner -->
+  <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+  <!-- Main Content Container -->
+  <main class="main-content">
+    <div class="content-container">
+
+      <!-- View Selector & Filter Controls -->
+      <section class="controls-bar">
+        <div class="view-tabs">
+          <button id="tabAllPosts" class="tab-btn active">
+            All Posts
+            <span id="postCountBadge" class="badge">0</span>
+          </button>
+          <button id="tabTopPosts" class="tab-btn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+            </svg>
+            Top 3 Most Recent
+          </button>
+        </div>
+
+        <div class="controls-right">
+          <button id="refreshBtn" class="btn btn-icon" title="Refresh Feed">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="23 4 23 10 17 10"></polyline>
+              <polyline points="1 20 1 14 7 14"></polyline>
+              <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+            </svg>
+          </button>
+        </div>
+      </section>
+
+      <!-- Active View Title Info -->
+      <div class="view-header">
+        <h2 id="viewTitle">All Published Posts</h2>
+        <p id="viewDescription">Displaying all documents persisted in MongoDB Atlas, populated with relational author profiles.</p>
+      </div>
+
+      <!-- State: Loading Spinner -->
+      <div id="loadingState" class="state-container">
+        <div class="spinner"></div>
+        <p>Loading posts from MongoDB Atlas...</p>
+      </div>
+
+      <!-- State: API Error Banner -->
+      <div id="errorState" class="state-container state-error hidden">
+        <div class="state-icon">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+        </div>
+        <h3 id="errorMessage">Unable to connect to backend server</h3>
+        <p>Make sure your Express server is running on port 5000 and MongoDB Atlas is connected.</p>
+        <button id="retryBtn" class="btn btn-primary">Retry Connection</button>
+      </div>
+
+      <!-- State: Empty State -->
+      <div id="emptyState" class="state-container hidden">
+        <div class="state-icon">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <polyline points="10 9 9 9 8 9"></polyline>
+          </svg>
+        </div>
+        <h3>No posts found in database</h3>
+        <p>Get started by creating your first post or seeding test data!</p>
+        <button id="emptyCreateBtn" class="btn btn-primary">Create Your First Post</button>
+      </div>
+
+      <!-- Posts Grid -->
+      <div id="postsGrid" class="posts-grid hidden"></div>
+    </div>
+  </main>
+
+  <!-- Modal: Create Post -->
+  <div id="postModal" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Create New Blog Post</h3>
+        <button class="modal-close" id="closePostModal">&times;</button>
+      </div>
+      <form id="createPostForm" class="modal-body">
+        <div class="form-group">
+          <label for="postTitle">Title <span class="required">*</span></label>
+          <input type="text" id="postTitle" placeholder="e.g., MongoDB Atlas Integration" required maxlength="120">
+        </div>
+
+        <div class="form-group">
+          <label for="postAuthorSelect">Author <span class="required">*</span></label>
+          <div class="author-select-wrapper">
+            <select id="postAuthorSelect" required>
+              <option value="" disabled selected>Select an author...</option>
+            </select>
+            <button type="button" id="quickAddAuthorBtn" class="btn btn-small btn-secondary" title="Create a new author">
+              + New User
+            </button>
+          </div>
+          <span class="form-hint">Posts are linked to Users using Mongoose relational ObjectIds (`authorId`).</span>
+        </div>
+
+        <div class="form-group">
+          <label for="postContent">Content <span class="required">*</span></label>
+          <textarea id="postContent" rows="5" placeholder="Write your post content here..." required></textarea>
+        </div>
+
+        <div id="createPostError" class="form-error hidden"></div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="cancelPostBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="submitPostBtn">
+            <span>Publish Post</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Manage & Create Users -->
+  <div id="userModal" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>User Management (Authors)</h3>
+        <button class="modal-close" id="closeUserModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="createUserForm" class="user-create-form">
+          <h4 class="form-section-title">Add New User</h4>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="userName">Full Name <span class="required">*</span></label>
+              <input type="text" id="userName" placeholder="Raj Kumar" required>
+            </div>
+            <div class="form-group">
+              <label for="userEmail">Email Address <span class="required">*</span></label>
+              <input type="email" id="userEmail" placeholder="raj@example.com" required>
+            </div>
+          </div>
+          <div id="createUserError" class="form-error hidden"></div>
+          <button type="submit" class="btn btn-primary btn-small" id="submitUserBtn">Create User</button>
+        </form>
+
+        <div class="user-list-section">
+          <h4 class="form-section-title">Existing Users in Database (<span id="userCount">0</span>)</h4>
+          <div id="userListLoading" class="mini-spinner-wrapper hidden"><div class="mini-spinner"></div></div>
+          <ul id="userList" class="user-list"></ul>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="closeUserModalFooterBtn">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Delete Confirmation -->
+  <div id="deleteModal" class="modal-backdrop hidden">
+    <div class="modal-card modal-small">
+      <div class="modal-header">
+        <h3 class="danger-title">Delete Post</h3>
+        <button class="modal-close" id="closeDeleteModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete this post? This document will be permanently removed from MongoDB Atlas.</p>
+        <p class="post-to-delete-title" id="deletePostTitle">"Post Title"</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="cancelDeleteBtn">Cancel</button>
+        <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete Document</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
+

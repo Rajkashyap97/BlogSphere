@@ -1,0 +1,31 @@
+{
+  "name": "blogsphere",
+  "version": "1.0.0",
+  "description": "BlogSphere - Full-Stack Blogging Application (Sprint 10: The Data Storm)",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "nodemon backend/server.js",
+    "seed": "node backend/seed.js",
+    "test": "node backend/test.js"
+  },
+  "keywords": [
+    "express",
+    "mongodb",
+    "mongoose",
+    "blogsphere",
+    "sprint10"
+  ],
+  "author": "Raj Kumar",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "mongoose": "^8.9.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
+}
+
