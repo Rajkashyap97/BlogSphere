@@ -5,9 +5,11 @@
 
 // Dynamically determine API Base URL
 // Defaults to current origin if served from Express backend, or fallback to port 5000
+
 const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
   ? (window.location.port === '5000' ? '' : 'http://localhost:5000')
-  : '';
+  : 'https://blogsphere-qh5i.onrender.com';
+
 
 // Application State
 const state = {
